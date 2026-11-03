@@ -13,7 +13,7 @@ class ClientController extends Controller
     // GET /api/v1/clients
     public function index(Request $request): JsonResponse
     {
-        $query = Client::query();
+        $query = Client::withCount('contacts');
 
         if ($request->filled('q')) {
             $search = $request->query('q');
@@ -27,6 +27,14 @@ class ClientController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->query('status'));
         }
+
+        if ($request->filled('city')) {
+            $query->where('city', $request->query('city'));
+        }
+
+        $totalClients = Client::count();
+        $activeClients = Client::where('status', 'active')->count();
+        $archivedClients = $totalClients - $activeClients;
 
         $limit = min(
             max((int) $request->query('limit', 10), 1),
@@ -43,6 +51,11 @@ class ClientController extends Controller
                 'last_page' => $clients->lastPage(),
                 'per_page' => $clients->perPage(),
                 'total' => $clients->total(),
+                'stats' => [
+                    'total' => $totalClients,
+                    'active' => $activeClients,
+                    'archived' => $archivedClients,
+                ],
             ],
         ]);
     }
@@ -168,25 +181,32 @@ class ClientController extends Controller
     }
 
     // PATCH /api/v1/clients/{clientId}/status
-    public function updateStatus(string $clientId): JsonResponse
+    public function updateStatus(Request $request, string $clientId): JsonResponse
     {
         // Cari berdasarkan 'id' ATAU 'code'
-    $client = Client::where('id', $clientId)
-        ->orWhere('code', $clientId)
-        ->first();
+        $client = Client::where('id', $clientId)
+            ->orWhere('code', $clientId)
+            ->first();
 
         if (!$client) {
             return $this->notFound();
         }
 
-        // Arsipkan klien dan kontaknya tanpa menghapus data.
-        $client->update(['status' => 'archived']);
+        $newStatus = $request->input('status');
+        if (!$newStatus) {
+            $newStatus = ($client->status === 'active') ? 'archived' : 'active';
+        }
 
-        $client->contacts()->update(['status' => 'archived']);
+        $client->update(['status' => $newStatus]);
+        $client->contacts()->update(['status' => $newStatus]);
+
+        $message = ($newStatus === 'active')
+            ? 'Klien dan kontaknya berhasil dipulihkan.'
+            : 'Klien dan kontaknya berhasil diarsipkan.';
 
         return response()->json([
             'success' => true,
-            'message' => 'Klien dan kontaknya berhasil diarsipkan.',
+            'message' => $message,
             'data' => $client->fresh(),
         ]);
     }

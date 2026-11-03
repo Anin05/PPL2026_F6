@@ -23,134 +23,84 @@
 </div>
 
 <div class="form-grid">
-    <form class="card" action="{{ route('riwayat.store') }}" method="POST">
-        @csrf
+    <form class="card" id="form-interaksi" novalidate>
         <div class="f-head">
             <h2>Data Komunikasi</h2>
-            <p>Catatan ini akan tersimpan pada riwayat klien dan kontak yang dipilih.</p>
+            <p>Catatan ini akan tersimpan pada riwayat klien yang dipilih.</p>
         </div>
 
         <div class="f-body">
             <!-- Klien -->
-            <div class="field {{ $errors->has('klien_id') ? 'err' : '' }}">
+            <div class="field full" id="field-klien">
                 <label>Klien Terkait <em>*</em></label>
                 <div class="inp">
-                    <select name="klien_id" id="selKlien" required onchange="filterContacts()">
-                        <option value="">Pilih klien...</option>
-                        @foreach ($clients as $c)
-                            <option value="{{ $c->id }}" data-kode="{{ $c->kode }}" {{ (old('klien_id') == $c->id || ($selectedKlien && $selectedKlien->id == $c->id)) ? 'selected' : '' }}>
-                                {{ $c->kode }} · {{ $c->nama }}
-                            </option>
-                        @endforeach
+                    <select name="client_id" id="sel-klien" required>
+                        <option value="">Memuat daftar klien...</option>
                     </select>
                     <x-icon name="chevD" size="15" class="chev" />
                 </div>
-                @error('klien_id') <div class="err-msg">{{ $message }}</div> @enderror
-            </div>
-
-            <!-- Kontak Terkait -->
-            <div class="field">
-                <label>Kontak Terkait</label>
-                <div class="inp">
-                    <select name="kontak_id" id="selKontak">
-                        <option value="">Pilih kontak (opsional)...</option>
-                        @if ($selectedKlien)
-                            @foreach ($selectedKlien->kontaks as $kt)
-                                <option value="{{ $kt->id }}" {{ old('kontak_id') == $kt->id ? 'selected' : '' }}>
-                                    {{ $kt->nama }} ({{ $kt->tipe }} - {{ $kt->jabatan }})
-                                </option>
-                            @endforeach
-                        @endif
-                    </select>
-                    <x-icon name="chevD" size="15" class="chev" />
-                </div>
-            </div>
-
-            <!-- Subjek -->
-            <div class="field full {{ $errors->has('subjek') ? 'err' : '' }}">
-                <label>Subjek Komunikasi <em>*</em></label>
-                <div class="inp">
-                    <input name="subjek" value="{{ old('subjek') }}" placeholder="Contoh: Pembahasan perpanjangan kontrak kerja sama" required>
-                </div>
-                @error('subjek') <div class="err-msg">{{ $message }}</div> @enderror
             </div>
 
             <!-- Kanal -->
-            <div class="field">
+            <div class="field" id="field-type">
                 <label>Kanal Komunikasi <em>*</em></label>
                 <div class="inp">
-                    <select name="kanal" required>
-                        <option value="Rapat" {{ old('kanal') === 'Rapat' ? 'selected' : '' }}>Rapat</option>
-                        <option value="Email" {{ old('kanal') === 'Email' ? 'selected' : '' }}>Email</option>
-                        <option value="WhatsApp" {{ old('kanal') === 'WhatsApp' ? 'selected' : '' }}>WhatsApp</option>
-                        <option value="Telepon" {{ old('kanal') === 'Telepon' ? 'selected' : '' }}>Telepon</option>
+                    <select name="type" id="sel-type" required>
+                        <option value="Meeting">Rapat / Meeting</option>
+                        <option value="Email">Email</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Telepon">Telepon</option>
+                        <option value="Kunjungan">Kunjungan</option>
                     </select>
                     <x-icon name="chevD" size="15" class="chev" />
                 </div>
             </div>
 
             <!-- Tanggal -->
-            <div class="field">
-                <label>Tanggal <em>*</em></label>
+            <div class="field" id="field-date">
+                <label>Tanggal Interaksi <em>*</em></label>
                 <div class="inp">
-                    <input name="tgl" type="date" value="{{ old('tgl', date('Y-m-d')) }}" required>
+                    <input name="date" id="inp-date" type="date" value="{{ date('Y-m-d') }}" required>
                 </div>
             </div>
 
-            <!-- Waktu Mulai & Selesai -->
-            <div class="field">
-                <label>Waktu Mulai</label>
+            <!-- Waktu -->
+            <div class="field" id="field-time">
+                <label>Waktu Interaksi</label>
                 <div class="inp">
-                    <input name="jam" value="{{ old('jam', '09.00') }}" placeholder="09.00">
+                    <input name="time" id="inp-time" type="time" value="{{ date('H:i') }}">
                 </div>
             </div>
 
-            <div class="field">
-                <label>Waktu Selesai</label>
+            <!-- Catatan / Pembahasan -->
+            <div class="field full" id="field-notes">
+                <label>Catatan Pembahasan / Hasil Komunikasi <em>*</em></label>
                 <div class="inp">
-                    <input name="akhir" value="{{ old('akhir', '10.00') }}" placeholder="10.00">
-                </div>
-            </div>
-
-            <!-- Ringkasan Singkat -->
-            <div class="field full">
-                <label>Ringkasan Pembahasan</label>
-                <div class="inp">
-                    <textarea name="ringkas" placeholder="Catat poin-poin utama diskusi...">{{ old('ringkas') }}</textarea>
-                </div>
-            </div>
-
-            <!-- Hasil Kesepakatan -->
-            <div class="field full">
-                <label>Hasil / Kesepakatan</label>
-                <div class="inp">
-                    <textarea name="hasil" placeholder="Hasil keputusan atau kesepakatan yang dicapai...">{{ old('hasil') }}</textarea>
+                    <textarea name="notes" id="inp-notes" rows="4" placeholder="Contoh: Pembahasan perpanjangan kontrak kerja sama dan kesepakatan jadwal demo sistem..." required></textarea>
+                    <span class="ic-err"><x-icon name="alert" size="16" /></span>
                 </div>
             </div>
 
             <!-- Tindak Lanjut Section -->
             <div class="field full" style="border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
-                <h3 style="font-size: 15px; color: var(--navy); margin-bottom: 8px;">Rencana Tindak Lanjut (Opsional)</h3>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" id="chk-tindak-lanjut" onchange="toggleTindakLanjut(this.checked)">
+                    <span style="font-weight:600; color:var(--navy);">Rencanakan Tindak Lanjut (Follow-up)</span>
+                </label>
             </div>
 
-            <div class="field">
-                <label>Tanggal Tindak Lanjut</label>
-                <div class="inp">
-                    <input name="follow_tgl" type="date" value="{{ old('follow_tgl') }}">
+            <div id="box-tindak-lanjut" class="field full" style="display:none; background:#fffbeb; border:1px solid #fde68a; padding:12px; border-radius:8px;">
+                <div class="field" style="margin-bottom:8px;">
+                    <label style="color:#92400e;">Tanggal Tindak Lanjut</label>
+                    <div class="inp">
+                        <input type="date" id="inp-tl-date">
+                    </div>
                 </div>
-            </div>
-
-            <div class="field">
-                <label>Aksi Tindak Lanjut</label>
-                <div class="inp">
-                    <input name="follow_aksi" value="{{ old('follow_aksi') }}" placeholder="Contoh: Kirim penawaran revisi">
-                </div>
-            </div>
-
-            <div class="field full">
-                <label>Detail Tindak Lanjut</label>
-                <div class="inp">
-                    <textarea name="follow_detail" placeholder="Instruksi atau catatan tindak lanjut...">{{ old('follow_detail') }}</textarea>
+                <div class="field">
+                    <label style="color:#92400e;">Catatan Rencana Tindak Lanjut</label>
+                    <div class="inp">
+                        <input id="inp-tl-notes" placeholder="Contoh: Kirim revisi penawaran harga dan ikuti perkembangannya">
+                    </div>
                 </div>
             </div>
         </div>
@@ -159,7 +109,7 @@
             <div class="req">* Wajib diisi</div>
             <div class="btns">
                 <a class="btn btn-outline" href="{{ route('riwayat.index') }}">Batal</a>
-                <button class="btn btn-primary" type="submit">
+                <button class="btn btn-primary" type="submit" id="btn-submit">
                     <x-icon name="check" size="16" /> Simpan Interaksi
                 </button>
             </div>
@@ -167,37 +117,137 @@
     </form>
 
     <aside class="side-col">
+        <div class="s-card" id="side-klien-preview" style="display:none;">
+            <h3><x-icon name="building" size="16" /> Perusahaan Terpilih</h3>
+            <div id="side-klien-nama" style="font-size:15px; font-weight:700; color:var(--navy); margin:6px 0;">-</div>
+            <div class="row" style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="side-klien-kode">-</span>
+                <span class="badge ok"><i></i>Aktif</span>
+            </div>
+            <hr style="margin:10px 0; border:0; border-top:1px solid var(--border)">
+            <div class="row" style="font-size:13px; color:var(--muted);"><x-icon name="pin" size="14" /> <span id="side-klien-kota">-</span></div>
+        </div>
+
         <div class="s-card">
             <h3><x-icon name="info" size="16" /> Panduan Interaksi</h3>
             <p>Mencatat setiap interaksi secara berkala menjaga rekam jejak hubungan kerja sama yang akurat dengan klien.</p>
-            <hr>
-            <p>Jika ada janji temu, pengiriman proposal, atau revisi kontrak, aktifkan bagian <b>Rencana Tindak Lanjut</b> agar otomatis terpantau.</p>
+            <hr style="margin:10px 0; border:0; border-top:1px solid var(--border)">
+            <p>Jika ada janji temu, pengiriman proposal, atau revisi kontrak, aktifkan opsi <b>Rencanakan Tindak Lanjut</b> agar otomatis terpantau di Dashboard.</p>
         </div>
     </aside>
 </div>
+@endsection
 
 @push('scripts')
 <script>
-    const clientsData = @json($clients->map(fn($c) => ['id' => $c->id, 'kontaks' => $c->kontaks]));
+let clientsData = [];
+const urlParams = new URLSearchParams(window.location.search);
+const preselectedClientId = urlParams.get('client_id') || urlParams.get('klien_id');
+const preselectedClientCode = urlParams.get('kode') || urlParams.get('client_code');
 
-    function filterContacts() {
-        const klienId = document.getElementById('selKlien').value;
-        const selKontak = document.getElementById('selKontak');
-        selKontak.innerHTML = '<option value="">Pilih kontak (opsional)...</option>';
+function toggleTindakLanjut(checked) {
+    document.getElementById('box-tindak-lanjut').style.display = checked ? 'block' : 'none';
+}
 
-        if (!klienId) return;
+function updateClientPreview(selectedId) {
+    const preview = document.getElementById('side-klien-preview');
+    const client = clientsData.find(c => c.id === selectedId || c.code === selectedId);
+    if (!client) {
+        preview.style.display = 'none';
+        return;
+    }
+    document.getElementById('side-klien-nama').textContent = client.name;
+    document.getElementById('side-klien-kode').textContent = client.code;
+    document.getElementById('side-klien-kota').textContent = client.city || 'Kota belum diatur';
+    preview.style.display = 'block';
+}
 
-        const c = clientsData.find(x => x.id == klienId);
-        if (c && c.kontaks) {
-            c.kontaks.forEach(kt => {
-                const opt = document.createElement('option');
-                opt.value = kt.id;
-                opt.textContent = `${kt.nama} (${kt.tipe} - ${kt.jabatan || 'Staf'})`;
-                selKontak.appendChild(opt);
-            });
+async function muatKlien() {
+    const sel = document.getElementById('sel-klien');
+    try {
+        const res = await api('GET', '/clients?limit=100&status=active');
+        clientsData = res.data || [];
+        sel.innerHTML = '<option value="">Pilih perusahaan klien...</option>';
+        clientsData.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.code + ' · ' + c.name;
+            if (preselectedClientId === c.id || preselectedClientCode === c.code) {
+                opt.selected = true;
+            }
+            sel.appendChild(opt);
+        });
+
+        if (sel.value) {
+            updateClientPreview(sel.value);
+        }
+    } catch (e) {
+        console.error(e);
+        sel.innerHTML = '<option value="">Gagal memuat daftar klien</option>';
+    }
+}
+
+document.getElementById('sel-klien').addEventListener('change', (e) => {
+    updateClientPreview(e.target.value);
+});
+
+function tampilkanError(details) {
+    document.querySelectorAll('.err-msg.js').forEach(e => e.remove());
+    document.querySelectorAll('.field.err').forEach(e => e.classList.remove('err'));
+    
+    Object.entries(details || {}).forEach(([field, pesan]) => {
+        const input = document.querySelector('[name="' + field + '"]');
+        if (!input) return;
+        const box = input.closest('.field');
+        if (!box) return;
+        box.classList.add('err');
+        const msg = document.createElement('div');
+        msg.className = 'err-msg js';
+        msg.textContent = Array.isArray(pesan) ? pesan[0] : pesan;
+        box.appendChild(msg);
+    });
+}
+
+document.getElementById('form-interaksi').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-submit');
+    const label = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan interaksi...';
+
+    const f = Object.fromEntries(new FormData(e.target));
+    const isTl = document.getElementById('chk-tindak-lanjut').checked;
+    const tlDate = document.getElementById('inp-tl-date').value;
+    const tlNotes = document.getElementById('inp-tl-notes').value.trim();
+
+    let fullNotes = f.notes;
+    if (isTl) {
+        fullNotes += ' (Tindak lanjut: ' + (tlNotes || 'Menunggu jadwal follow-up') + (tlDate ? ' per ' + tlDate : '') + ')';
+    }
+
+    const interactionAt = (f.date || '{{ date("Y-m-d") }}') + ' ' + (f.time ? f.time + ':00' : '09:00:00');
+
+    try {
+        await api('POST', '/interactions', {
+            client_id: f.client_id,
+            type: f.type,
+            notes: fullNotes,
+            interaction_at: interactionAt,
+        });
+        sessionStorage.setItem('flash', 'Catatan interaksi berhasil disimpan.');
+        window.location.href = '/riwayat';
+    } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = label;
+        if (err.error && err.error.details) {
+            tampilkanError(err.error.details);
+        }
+        if (err.error && err.error.message) {
+            alert(err.error.message);
         }
     }
+});
+
+muatKlien();
 </script>
 @endpush
-@endsection
-

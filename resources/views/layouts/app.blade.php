@@ -142,7 +142,8 @@
                 if (menu) menu.classList.toggle('show');
             }
         });
-        <script src="{{ asset('js/api.js') }}"></script>
+    </script>
+    <script src="{{ asset('js/api.js') }}"></script>
     <script>
         // tampilkan pesan sukses yang disimpan sebelum pindah halaman
         (function () {
@@ -151,13 +152,12 @@
             sessionStorage.removeItem('flash');
             const el = document.createElement('div');
             el.className = 'alert ok';
-            el.innerHTML = '<div><b>Berhasil!</b><br></div>';
-            el.firstChild.append(msg);
-            document.querySelector('main.content').prepend(el);
+            el.innerHTML = '<span class="al-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span><div><b>Berhasil!</b><br></div>';
+            el.querySelector('div').append(msg);
+            const mainContent = document.querySelector('main.content');
+            if (mainContent) mainContent.prepend(el);
         })();
-        </script>                                   <!-- dropdown, baris 145 -->
-    <script src="{{ asset('js/api.js') }}"></script>
-    <script> ... flash ... </script>
+    </script>
     @stack('scripts')
 </body>
 </html>
