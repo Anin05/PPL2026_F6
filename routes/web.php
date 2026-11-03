@@ -1,16 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ClientController;
 
-Route::get('/', function () {
-    return redirect()->route('clients.index');
-});
+Route::redirect('/', '/klien');
+Route::get('/dashboard', fn () => redirect()->route('klien.index'))->name('dashboard');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::view('/klien', 'klien.index')->name('klien.index');
+Route::view('/klien/tambah', 'klien.create')->name('klien.create');
+Route::get('/klien/{kode}', fn ($kode) => view('klien.show', compact('kode')))->name('klien.show');
+Route::get('/klien/{kode}/edit', fn ($kode) => view('klien.edit', compact('kode')))->name('klien.edit');
 
-// CRUD Klien Route
-Route::resource('clients', ClientController::class);
-Route::get('clients-export', [ClientController::class, 'export'])->name('clients.export');
+Route::get('/kontak', fn () => view('belum_tersedia', ['judul' => 'Kontak Klien']))->name('kontak.index');
+Route::get('/riwayat', fn () => view('belum_tersedia', ['judul' => 'Riwayat Interaksi']))->name('riwayat.index');
+Route::get('/arsip', fn () => view('belum_tersedia', ['judul' => 'Arsip']))->name('arsip.index');

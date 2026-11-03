@@ -1,247 +1,164 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="id">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'CRM Klien & Kontak' }} - PT Anaheim Nimbus Universal</title>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@yield('title', 'ANAHEIM CRM') - PT Anaheim Nimbus Universal</title>
+    <meta name="description" content="ANAHEIM ERP F-6 – Modul CRM Klien & Kontak">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
     <style>
-        @layer base {
-            html, body { margin: 0; padding: 0; }
-            body { overscroll-behavior: none; }
-            main > :first-child { margin-top: 0 !important; }
-            main > :last-child { margin-bottom: 0 !important; }
-        }
-        ::-webkit-scrollbar { display: none; }
+        /* Additional styling for clean blade integration */
+        .pagination-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+        .pagination-bar nav { display: flex; gap: 4px; align-items: center; }
+        .pagination-bar .page-link { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid var(--border); border-radius: 6px; font-weight: 500; color: var(--navy); text-decoration: none; background: #fff; }
+        .pagination-bar .page-link.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .pagination-bar .page-link.disabled { opacity: 0.5; pointer-events: none; }
+        .dropdown-menu { position: absolute; right: 0; top: 100%; margin-top: 4px; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); min-width: 160px; z-index: 50; display: none; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 12px; font-size: 13px; color: var(--navy); text-decoration: none; width: 100%; background: none; border: none; text-align: left; cursor: pointer; }
+        .dropdown-item:hover { background: var(--bg-hover, #f8fafc); }
+        .dropdown-item.danger { color: #dc2626; }
+        .rel { position: relative; }
     </style>
-
-    <!-- Tailwind CDN Script (Sesuai Konfigurasi Custom Tema) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-fixed-dim": "#c3c0ff",
-                        "tertiary": "#005522",
-                        "tertiary-fixed-dim": "#62df7d",
-                        "on-error-container": "#93000a",
-                        "surface-container-low": "#f2f3ff",
-                        "primary-container": "#4f46e5",
-                        "inverse-surface": "#283044",
-                        "surface-tint": "#4d44e3",
-                        "surface-container-high": "#e2e7ff",
-                        "on-primary": "#ffffff",
-                        "secondary-fixed-dim": "#c0c1ff",
-                        "outline-variant": "#c7c4d8",
-                        "on-surface-variant": "#464555",
-                        "on-secondary": "#ffffff",
-                        "background": "#faf8ff",
-                        "surface": "#faf8ff",
-                        "primary": "#3525cd",
-                        "secondary-fixed": "#e1e0ff",
-                        "on-tertiary-fixed": "#002109",
-                        "surface-container": "#eaedff",
-                        "on-primary-fixed-variant": "#3323cc",
-                        "tertiary-container": "#00702f",
-                        "on-surface": "#131b2e",
-                        "secondary": "#4648d4",
-                        "error-container": "#ffdad6",
-                        "inverse-primary": "#c3c0ff",
-                        "on-surface-variant": "#464555",
-                        "surface-dim": "#d2d9f4",
-                        "inverse-on-surface": "#eef0ff",
-                        "on-primary-fixed": "#0f0069",
-                        "surface-bright": "#faf8ff",
-                        "on-secondary-fixed": "#07006c",
-                        "surface-variant": "#dae2fd",
-                        "on-tertiary-container": "#78f591",
-                        "secondary-container": "#6063ee",
-                        "primary-fixed": "#e2dfff",
-                        "on-secondary-fixed-variant": "#2f2ebe",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary-fixed-variant": "#005320",
-                        "on-error": "#ffffff",
-                        "surface-container-highest": "#dae2fd",
-                        "outline": "#777587",
-                        "error": "#ba1a1a",
-                        "on-tertiary": "#ffffff",
-                        "on-primary-container": "#dad7ff",
-                        "tertiary-fixed": "#7ffc97"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "space-md": "1rem",
-                        "space-xs": "0.25rem",
-                        "space-sm": "0.5rem",
-                        "space-xl": "2rem",
-                        "margin-mobile": "1rem",
-                        "space-lg": "1.5rem",
-                        "margin": "2rem",
-                        "gutter": "1.5rem",
-                        "gutter-mobile": "0.75rem"
-                    },
-                    "fontFamily": {
-                        "display-lg": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "label-md": ["Inter"],
-                        "headline-lg-mobile": ["Inter"],
-                        "headline-md": ["Inter"],
-                        "title-sm": ["Inter"],
-                        "headline-lg": ["Inter"],
-                        "table-header": ["Inter"],
-                        "label-sm": ["Inter"],
-                        "body-sm": ["Inter"],
-                        "body-md": ["Inter"]
-                    },
-                    "fontSize": {
-                        "display-lg": ["2rem", { "lineHeight": "2.5rem", "fontWeight": "700" }],
-                        "body-lg": ["1rem", { "lineHeight": "1.5rem", "fontWeight": "400" }],
-                        "label-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "500" }],
-                        "headline-lg-mobile": ["1.25rem", { "lineHeight": "1.75rem", "fontWeight": "600" }],
-                        "headline-md": ["1.125rem", { "lineHeight": "1.625rem", "fontWeight": "600" }],
-                        "title-sm": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "600" }],
-                        "headline-lg": ["1.5rem", { "lineHeight": "2rem", "fontWeight": "600" }],
-                        "table-header": ["0.6875rem", { "lineHeight": "1rem", "fontWeight": "600" }],
-                        "label-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "500" }],
-                        "body-sm": ["0.75rem", { "lineHeight": "1rem", "fontWeight": "400" }],
-                        "body-md": ["0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" }]
-                    }
-                }
-            }
-        };
-    </script>
 </head>
-<body class="bg-background font-body-md text-body-md text-on-surface antialiased">
-    <!-- Sidebar -->
-    <aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between select-none">
-        <div class="flex flex-col">
-            <div class="h-16 px-space-lg flex items-center gap-space-sm bg-surface-container-lowest">
-                <img alt="Anaheim Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XN_4VqM4oaRH21Q9mZUkSukKtMoDBVWbmDbZpiU9dudFr-emrwntq7ijMsinBtPbd7V5DEqTxh2Sq7oJK5hAcGMbKSn31bUQfjQgeS74FT4JYrtbjivSWQ4Ui-r8u3iWd08epWADzPuu2m7scZAlGAngUF7AGQFYiHslSOesL1sofcb4HLu7eO0CzZ9QlyuNufc7fw40HWq_RwlG0PxGQe9wkusNH8PaV9HemnXuHG_illSrDnm_giQMjN"/>
-                <div class="flex flex-col min-w-0 leading-none">
-                    <span class="font-title-sm text-title-sm text-on-surface tracking-tight uppercase truncate">ANAHEIM</span>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant truncate">PT Anaheim Nimbus Universal</span>
-                </div>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="brand-row"><span class="logo-mark">A</span>ANAHEIM</div>
+                <small>PT Anaheim Nimbus Universal</small>
             </div>
-            
-            <div class="px-space-lg pt-space-lg pb-space-xs">
-                <p class="font-table-header text-table-header uppercase tracking-wider text-outline">WORKSPACE</p>
-                <p class="font-title-sm text-title-sm text-on-surface truncate mt-space-xs">F-6 · CRM Klien &amp; Kontak</p>
+            <div class="ws">
+                <small>WORKSPACE</small>
+                <b>F-6 · CRM Klien &amp; Kontak</b>
             </div>
-
-            <nav class="flex flex-col gap-space-xs px-space-sm mt-space-sm">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-body-md text-body-md {{ request()->routeIs('dashboard') ? 'bg-surface-container-high text-primary font-title-sm' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface' }} transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">grid_view</span>
-                    <span class="truncate">Dashboard</span>
+            <nav class="nav">
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'cur' : '' }}">
+                    <x-icon name="grid" size="17" /> Dashboard
                 </a>
-
-                <a href="{{ route('clients.index') }}" class="flex items-center justify-between px-space-sm py-space-sm transition-colors {{ request()->routeIs('clients.*') ? 'bg-surface-container-high text-primary font-title-sm' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface' }} rounded-lg">
-                    <div class="flex items-center gap-space-sm min-w-0">
-                        <span class="material-symbols-outlined text-[20px]">apartment</span>
-                        <span class="truncate">Master Klien</span>
-                    </div>
-                    <span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed">{{ $totalClients ?? 0 }}</span>
+                <a href="{{ route('klien.index') }}" class="{{ request()->routeIs('klien.*') ? 'cur' : '' }}">
+                    <x-icon name="building" size="17" /> Master Klien
                 </a>
-
-                <a href="#" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">contact_page</span>
-                    <span class="truncate">Kontak Klien</span>
+                <a href="{{ route('kontak.index') }}" class="{{ request()->routeIs('kontak.*') ? 'cur' : '' }}">
+                    <x-icon name="contact" size="17" /> Kontak Klien
                 </a>
-
-                <a href="#" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">chat</span>
-                    <span class="truncate">Riwayat Interaksi</span>
+                <a href="{{ route('riwayat.index') }}" class="{{ request()->routeIs('riwayat.*') ? 'cur' : '' }}">
+                    <x-icon name="message" size="17" /> Riwayat Interaksi
                 </a>
-
-                <a href="#" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">archive</span>
-                    <span class="truncate">Arsip</span>
+                <a href="{{ route('arsip.index') }}" class="{{ request()->routeIs('arsip.*') ? 'cur' : '' }}">
+                    <x-icon name="archive" size="17" /> Arsip
                 </a>
             </nav>
-        </div>
-
-        <div class="flex flex-col p-space-md gap-space-sm bg-surface-container-lowest">
-            <a href="#" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded-lg font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors">
-                <span class="material-symbols-outlined text-[20px]">help</span>
-                <span class="truncate">Pusat bantuan</span>
-            </a>
-            <div class="flex items-center gap-space-xs px-space-sm py-space-xs">
-                <span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
-                <span class="font-label-sm text-label-sm text-tertiary truncate">Sistem beroperasi normal</span>
+            <div class="side-foot">
+                <a class="help" href="#" onclick="alert('Pusat bantuan ANAHEIM ERP: hubungi support@anaheim.co.id'); return false;">
+                    <x-icon name="help" size="17" /> Pusat bantuan
+                </a>
+                <div class="side-status"><i></i>Sistem beroperasi normal</div>
+                <div class="side-ver">ANAHEIM ERP · Laravel v{{ Illuminate\Foundation\Application::VERSION }}</div>
             </div>
-            <div class="px-space-sm pt-space-xs">
-                <span class="font-table-header text-table-header text-outline tracking-tight block">ANAHEIM ERP · v2.4.0</span>
-            </div>
-        </div>
-    </aside>
+        </aside>
 
-    <div class="pl-64 flex flex-col min-h-screen">
-        <!-- Header -->
-        <header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter">
-            <div class="flex items-center gap-space-sm min-w-0">
-                <div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface-variant truncate">
-                    <span class="font-label-md text-label-md text-on-surface font-semibold truncate">CRM &amp; Kontak</span>
-                    <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
-                    <span class="font-label-md text-label-md text-primary font-semibold truncate">{{ $breadcrumb ?? 'Master Data' }}</span>
-                </div>
-            </div>
+        <div class="scrim" id="scrim" onclick="document.body.classList.remove('side-open')"></div>
 
-            <div class="flex items-center gap-space-md">
-                <div class="relative flex items-center">
-                    <form action="{{ route('clients.index') }}" method="GET" class="flex items-center bg-surface-container-low rounded-lg px-space-sm py-1.5 w-64 lg:w-80 gap-space-xs text-on-surface-variant focus-within:ring-2 focus-within:ring-primary focus-within:bg-surface-container-lowest transition-all">
-                        <span class="material-symbols-outlined text-[18px] text-outline">search</span>
-                        <input name="search" value="{{ request('search') }}" class="bg-transparent border-0 outline-none w-full font-body-sm text-body-sm text-on-surface placeholder-outline" placeholder="Cari di workspace..." type="text"/>
-                        <kbd class="font-table-header text-table-header px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant uppercase select-none">⌘ K</kbd>
-                    </form>
-                </div>
-
-                <div class="h-6 w-px bg-surface-container-high"></div>
-
-                <button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" type="button">
-                    <span class="material-symbols-outlined text-[20px]">notifications</span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>
+        <div class="main">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" onclick="document.body.classList.toggle('side-open')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
                 </button>
-
-                <div class="flex items-center gap-space-sm pl-space-xs cursor-pointer group">
-                    <img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7LwAIskFL62VI9xaMla0xFwHjiramjwszLxaa6QCKwcPueylsqOmBMBZ8CzCkEdue1Y4ygZn-qpKRrrp0IaOnxjbHhyA8Am5H4DCxHqonzTye62G5Tj6LZKnWFASEfQIpRn4177TObEvxpWV9-NpapsE-DTeGbyKsbjvsdtb7e24Clr2C3qHhhjDSUTDbs03fd6NBcDJ67xmknKM_-Af-EgBlvV3N_mH16dYM8nDckyxdWpHGup2kSA"/>
-                    <div class="hidden md:flex flex-col leading-tight">
-                        <span class="font-title-sm text-title-sm text-on-surface group-hover:text-primary transition-colors">{{ auth()->user()->name ?? 'Admin CRM' }}</span>
-                        <span class="font-label-sm text-label-sm text-on-surface-variant">{{ auth()->user()->role ?? 'Administrator' }}</span>
-                    </div>
-                    <span class="material-symbols-outlined text-[18px] text-outline group-hover:text-on-surface transition-colors">expand_more</span>
+                <h2 class="top-title" id="pageTitle">@yield('page_title', 'CRM Anaheim')</h2>
+                <div class="top-right">
+                    <form action="{{ route('klien.index') }}" method="GET" class="top-search">
+                        <x-icon name="search" size="16" />
+                        <input name="q" placeholder="Cari di workspace..." value="{{ request('q') }}" autocomplete="off">
+                        <kbd>⌘ K</kbd>
+                    </form>
+                    <button class="icon-btn bell" id="bellBtn" aria-label="Notifikasi" onclick="alert('Tidak ada notifikasi baru.')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <i class="dot"></i>
+                    </button>
+                    <span class="top-sep"></span>
+                    <button class="user" id="userBtn" type="button">
+                        <span class="user-av">AC</span>
+                        <span class="user-t"><b>Admin CRM</b><small>Administrator</small></span>
+                    </button>
                 </div>
-            </div>
-        </header>
+            </header>
 
-        <!-- Dynamic Main Content -->
-        <main class="flex-1 pt-16 w-full px-gutter pb-space-xl bg-background">
-            {{ $slot }}
-        </main>
+            <!-- Main Content Area -->
+            <main class="content">
+                @if (session('success'))
+                    <div class="alert ok" id="flash">
+                        <span class="al-ic"><x-icon name="check" size="14" /></span>
+                        <div><b>Berhasil!</b><br>{{ session('success') }}</div>
+                        <button class="al-x" onclick="this.closest('.alert').remove()" aria-label="Tutup"><x-icon name="x" size="14" /></button>
+                    </div>
+                @endif
 
-        <!-- Footer -->
-        <footer class="w-full bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] py-space-md px-gutter flex flex-col md:flex-row items-center justify-between gap-space-sm">
-            <span class="font-body-sm text-body-sm text-on-surface-variant">© {{ date('Y') }} PT Anaheim Nimbus Universal. Hak cipta dilindungi.</span>
-            <div class="flex items-center gap-space-md">
-                <span class="font-label-sm text-label-sm text-outline">F-6 · CRM Klien &amp; Kontak</span>
-                <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-                <span class="font-label-sm text-label-sm text-primary">Workspace Terenkripsi</span>
-            </div>
-        </footer>
+                @if (session('error'))
+                    <div class="alert" style="background:#fef2f2; border:1px solid #fecaca; color:#991b1b; display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; margin-bottom:16px;">
+                        <span class="al-ic"><x-icon name="alert" size="14" /></span>
+                        <div><b>Perhatian:</b><br>{{ session('error') }}</div>
+                        <button class="al-x" onclick="this.closest('.alert').remove()" aria-label="Tutup" style="margin-left:auto; background:none; border:none; cursor:pointer;"><x-icon name="x" size="14" /></button>
+                    </div>
+                @endif
+
+                @yield('content')
+            </main>
+
+            <!-- Footer -->
+            <footer class="foot">
+                <span>© 2026 PT Anaheim Nimbus Universal</span>
+                <span>F-6 · CRM Klien &amp; Kontak (Laravel Blade)</span>
+            </footer>
+        </div>
     </div>
 
+    <script>
+        // Dropdown menu toggle helper
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-dropdown-trigger]');
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (!btn || m !== btn.nextElementSibling) {
+                    m.classList.remove('show');
+                }
+            });
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                const menu = btn.nextElementSibling;
+                if (menu) menu.classList.toggle('show');
+            }
+        });
+        <script src="{{ asset('js/api.js') }}"></script>
+    <script>
+        // tampilkan pesan sukses yang disimpan sebelum pindah halaman
+        (function () {
+            const msg = sessionStorage.getItem('flash');
+            if (!msg) return;
+            sessionStorage.removeItem('flash');
+            const el = document.createElement('div');
+            el.className = 'alert ok';
+            el.innerHTML = '<div><b>Berhasil!</b><br></div>';
+            el.firstChild.append(msg);
+            document.querySelector('main.content').prepend(el);
+        })();
+        </script>                                   <!-- dropdown, baris 145 -->
+    <script src="{{ asset('js/api.js') }}"></script>
+    <script> ... flash ... </script>
     @stack('scripts')
 </body>
 </html>
+
