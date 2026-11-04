@@ -1,224 +1,187 @@
 # Modul F-6: CRM (Client and Contact Management)
 
-**ERP PT Anaheim Nimbus Universal — Kelompok F-6**
+**ERP PT Anaheim Nimbus Universal — Kelompok F-6 (Kelas F)**
 
 ## 1. Deskripsi Aplikasi
 
-Modul F-6 merupakan bagian dari sistem ERP yang berfungsi untuk mengelola data klien dan kontak perusahaan. Modul ini membantu proses pencatatan, penyimpanan, dan pengelolaan informasi klien agar data tersusun dengan rapi dan mudah diakses.
+Modul F-6 mengelola data klien dan kontak perusahaan di sistem ERP. Modul ini juga menyediakan API referensi klien yang dipakai modul lain, misalnya Registrasi Proyek (D-1).
 
-Fitur utama yang dikembangkan meliputi:
+Fitur yang dikembangkan:
 
-- Pengelolaan data klien.
-- Pembuatan kode unik untuk setiap klien.
-- Penyimpanan informasi perusahaan, seperti nama, alamat, dan kota.
-- Pengelolaan informasi kontak, seperti nomor telepon, email, dan PIC.
-- Penambahan, pengubahan, penampilan, dan penghapusan data klien.
+- Master klien: daftar, tambah, ubah, dan pencarian.
+- Kode klien unik untuk setiap perusahaan.
+- Pengarsipan klien dan kontak (data tidak dihapus permanen).
+- Kontak klien: PIC dan Direktur.
+- Riwayat interaksi dengan klien.
+- REST API `/api/v1` sebagai sumber data klien untuk modul lain.
 
-## 2. Teknologi yang Digunakan
+## 2. Teknologi
 
 | Teknologi | Keterangan |
 |---|---|
-| Laravel | Framework backend |
-| PHP | Bahasa pemrograman |
-| SQLite | Database lokal |
-| Composer | Dependency manager PHP |
-| REST API | Komunikasi antar aplikasi |
-| OpenAPI 3.0.0 | Standar dokumentasi API |
+| Laravel 13 | Framework backend dan tampilan (Blade) |
+| PHP 8.4+ | Bahasa pemrograman |
+| SQLite | Database lokal bawaan |
+| Composer | Pengelola dependency PHP |
+| REST API | Komunikasi antar modul (`/api/v1`) |
+| JavaScript (fetch) | Halaman web memanggil API |
+| OpenAPI 3.0 | Dokumentasi API (`openapi/openapi.yaml`) |
 | GitHub | Pengelolaan repositori |
 
-## 3. Struktur Repositori
+## 3. Cabang (Branch)
 
-Berikut merupakan struktur folder utama project Laravel F-6:
+| Cabang | Fungsi |
+|---|---|
+| `integrasi` | **Cabang kerja utama**: backend API + halaman web yang memakai API |
+| `be_anandita` | Backend API (asal cabang `integrasi`) |
+| `fe_mustika` | Tampilan web (asal tampilan di `integrasi`) |
+| `main` | Cabang utama repositori |
+
+Gunakan cabang **`integrasi`** untuk menjalankan aplikasi.
+
+## 4. Struktur Folder
 
 ```text
 PPL2026_F6/
 ├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   └── Requests/
-│   └── Models/
-├── bootstrap/
-├── config/
+│   ├── Http/Controllers/Api/   # ClientController, ContactController, InteractionController
+│   └── Models/                 # Client, Contact, Interaction
 ├── database/
-│   ├── migrations/
-│   ├── seeders/
-│   ├── factories/
-│   └── database.sqlite
+│   ├── migrations/             # tabel clients, contacts, interactions
+│   └── seeders/                # ClientSeeder, DatabaseSeeder (data contoh)
+├── examples/                   # contoh respons JSON
 ├── openapi/
-│   └── openapi.yaml
+│   └── openapi.yaml            # dokumentasi API
 ├── public/
-├── resources/
+│   ├── css/                    # style.css, layout.css
+│   └── js/api.js               # fungsi pemanggil API dari halaman web
+├── resources/views/            # halaman web: klien, kontak, riwayat, arsip, layouts
 ├── routes/
-│   ├── api.php
-│   └── web.php
-├── storage/
+│   ├── api.php                 # endpoint /api/v1
+│   └── web.php                 # halaman web
 ├── tests/
 ├── .env.example
-├── .gitignore
-├── artisan
 ├── composer.json
-├── composer.lock
 └── README.md
 ```
 
-**Keterangan folder dan file:**
-
-- `app/`: Menyimpan kode utama aplikasi, seperti model dan controller.
-- `bootstrap/`: Menyimpan proses awal atau konfigurasi bootstrap Laravel.
-- `config/`: Menyimpan konfigurasi aplikasi.
-- `database/`: Menyimpan migration, seeder, factory, dan database SQLite.
-- `openapi/`: Menyimpan spesifikasi dan dokumentasi REST API.
-- `public/`: Direktori utama yang dapat diakses melalui web.
-- `resources/`: Menyimpan file tampilan dan aset aplikasi.
-- `routes/`: Menyimpan definisi endpoint API dan web.
-- `storage/`: Menyimpan file log, cache, dan file yang dihasilkan aplikasi.
-- `tests/`: Menyimpan file pengujian aplikasi.
-- `.env.example`: Contoh konfigurasi environment aplikasi.
-- `artisan`: File command-line interface Laravel.
-- `composer.json`: Menyimpan informasi dependency project.
-- `composer.lock`: Menyimpan versi dependency yang digunakan project.
-
-## 4. Panduan Instalasi dan Menjalankan Backend Lokal
+## 5. Cara Menjalankan di Lokal
 
 ### A. Persyaratan
 
-Pastikan perangkat sudah memiliki beberapa kebutuhan berikut:
+- PHP **8.4 atau lebih baru** (dengan ekstensi `pdo_sqlite`)
+- Composer
+- Git
+- Browser (Postman opsional untuk uji API)
 
-- PHP sesuai versi yang dibutuhkan project Laravel.
-- Composer.
-- SQLite.
-- Git.
-- Web browser.
-- Postman (opsional, untuk pengujian API).
+Di Windows, **Laragon** sudah berisi PHP dan Composer. Pastikan versi PHP-nya 8.4+.
 
-### B. Clone Repository
-
-Buka terminal atau CMD, kemudian jalankan perintah berikut:
+### B. Langkah-langkah
 
 ```bash
-git clone https://github.com/Anin05/PPL2026_F6.git
-```
-
-Masuk ke folder project:
-
-```bash
+git clone -b integrasi https://github.com/Anin05/PPL2026_F6.git
 cd PPL2026_F6
-```
-
-### C. Install Dependency
-
-Jalankan perintah berikut untuk menginstal seluruh dependency Laravel:
-
-```bash
 composer install
 ```
 
-### D. Konfigurasi Environment
-
-Salin file `.env.example` menjadi `.env`.
-
-Untuk Windows CMD:
+Salin file environment (Windows CMD):
 
 ```cmd
 copy .env.example .env
 ```
 
-Untuk terminal Linux atau macOS:
+(Linux atau macOS: `cp .env.example .env`)
 
-```bash
-cp .env.example .env
-```
-
-Selanjutnya, buka file `.env` dan sesuaikan konfigurasi database menjadi:
+Pastikan di `.env` tertulis:
 
 ```env
 DB_CONNECTION=sqlite
 ```
 
-Pastikan konfigurasi database lainnya tidak mengarahkan aplikasi ke MySQL.
-
-### E. Menyiapkan Database SQLite
-
-Pastikan file database SQLite tersedia di dalam folder `database/` dengan nama:
-
-```text
-database/database.sqlite
-```
-
-Jika file tersebut belum tersedia, buat file baru bernama `database.sqlite` di dalam folder `database/`.
-
-Untuk Windows CMD, dapat menggunakan perintah:
-
-```cmd
-type nul > database\database.sqlite
-```
-
-### F. Generate Application Key
-
-Jalankan perintah berikut untuk membuat application key Laravel:
+Buat application key, tabel, dan data contoh:
 
 ```bash
 php artisan key:generate
+php artisan migrate:fresh --seed
 ```
 
-### G. Menjalankan Migration
+Jika Laravel bertanya apakah file database SQLite ingin dibuat, jawab `yes`. Perintah `migrate:fresh --seed` menghapus dan membuat ulang seluruh tabel, lalu mengisinya dengan data contoh.
 
-Jalankan perintah berikut untuk membuat tabel database berdasarkan file migration yang tersedia:
-
-```bash
-php artisan migrate
-```
-
-Jika project menyediakan seeder dan membutuhkan data awal, jalankan:
-
-```bash
-php artisan db:seed
-```
-
-### H. Menjalankan Server Laravel
-
-Setelah konfigurasi selesai, jalankan server lokal dengan perintah:
+Jalankan server:
 
 ```bash
 php artisan serve
 ```
 
-Jika berhasil, aplikasi backend dapat diakses melalui alamat:
+Aplikasi berjalan di `http://127.0.0.1:8000`.
+
+### C. Data Contoh (Seeder)
+
+`ClientSeeder` mengisi data fiktif: 3 klien (CLI-001 sampai CLI-003) beserta kontak PIC/Direktur dan riwayat interaksi. Seeder aman dijalankan ulang dengan `php artisan db:seed`.
+
+## 6. Halaman Web
+
+| Alamat | Keterangan | Status |
+|---|---|---|
+| `/klien` | Daftar Master Klien (data dari `GET /api/v1/clients`) | Berjalan |
+| `/klien/tambah` | Form Tambah Klien (mengirim ke `POST /api/v1/clients`) | Tampil; simpan masih ditolak API karena kode klien otomatis belum selesai |
+| `/klien/{kode}` | Detail klien | Belum dikonversi ke API |
+| `/klien/{kode}/edit` | Ubah klien | Belum dikonversi ke API |
+| `/kontak`, `/riwayat`, `/arsip` | Kontak, Riwayat Interaksi, Arsip | Halaman penampung |
+
+## 7. Dokumentasi API
+
+Kontrak API ditulis dengan OpenAPI pada berkas [`openapi/openapi.yaml`](openapi/openapi.yaml).
+
+Endpoint utama (awalan `/api/v1`):
+
+| Metode | Path | Fungsi |
+|---|---|---|
+| GET | `/clients` | Daftar klien (`q`, `status`, `page`, `limit`) |
+| GET | `/clients/{kode}` | Detail klien |
+| POST | `/clients` | Tambah klien |
+| PUT | `/clients/{id}` | Ubah klien |
+| PATCH | `/clients/{id}/status` | Arsipkan klien |
+| GET, POST | `/clients/{id}/contacts` | Daftar dan tambah kontak |
+| PUT | `/clients/{id}/contacts/{contactId}` | Ubah kontak |
+| PATCH | `/clients/{id}/contacts/{contactId}/status` | Arsipkan kontak |
+| GET, POST | `/clients/{id}/interactions` | Riwayat dan catat interaksi |
+
+Contoh:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:8000/api/v1/clients
+http://127.0.0.1:8000/api/v1/clients/CLI-001
 ```
 
-## 5. Dokumentasi API
+**Catatan format respons saat ini:** pembungkus respons berupa `success`, `data`, dan `meta`. Pengenal klien memakai `id` (UUID) dan `code`, sedangkan status bernilai `active` atau `archived`. Format ini **belum final** dan masih disesuaikan dengan kontrak bersama modul lain, jadi baca respons asli API sebelum mengintegrasikan. Endpoint kontak dan interaksi saat ini menerima UUID klien, bukan kode.
 
-Spesifikasi dan kontrak REST API Modul F-6 ditulis menggunakan standar OpenAPI 3.0.0 yang tersimpan pada berkas **[`openapi/openapi.yaml`](openapi/openapi.yaml)**.
+## 8. Integrasi dengan Modul Lain
 
-File tersebut menjelaskan daftar endpoint, metode HTTP, skema request dan response, serta kode status error yang digunakan dalam proses pengelolaan data klien dan kontak perusahaan.
+- **D-1 (Registrasi Proyek)** mengambil klien lewat `GET /api/v1/clients` dan `GET /api/v1/clients/{kode}`.
+- **F-1 (Identitas dan Akses)** direncanakan sebagai penyedia token dan peran. Autentikasi belum terhubung, sehingga API belum membatasi akses berdasarkan peran.
 
-Dokumentasi ini menjadi acuan bagi tim pengembang dalam memahami struktur komunikasi antara backend dan sistem lain yang terintegrasi dengan Modul F-6.
+## 9. Status Pengembangan
 
-## 6. Integrasi Sistem
+Sudah ada:
+- Struktur backend, endpoint API, dan data contoh.
+- Halaman daftar klien yang membaca API.
+- Form tambah klien yang memanggil API.
 
-Modul F-6 berfungsi untuk menyediakan dan mengelola data klien serta kontak perusahaan yang dapat digunakan oleh modul lain dalam sistem ERP.
+Belum selesai:
+- Pembuatan kode klien otomatis di backend.
+- Halaman detail dan ubah klien memakai API.
+- Penyesuaian format respons dengan kontrak.
+- Autentikasi dan pembatasan peran (F-1).
 
-Informasi yang dikelola meliputi:
+## 10. Pemecahan Masalah
 
-- Kode unik klien sebagai identitas setiap perusahaan.
-- Nama dan alamat perusahaan.
-- Informasi kota atau lokasi perusahaan.
-- Nama PIC atau penanggung jawab.
-- Nomor telepon dan alamat email kontak.
-
-Data tersebut dapat dimanfaatkan oleh modul lain yang membutuhkan informasi klien sebagai bagian dari proses bisnis perusahaan.
-
-## 7. Penutup
-
-Repository ini merupakan dokumentasi pengembangan Modul F-6: CRM (Client and Contact Management) pada proyek ERP PT Anaheim Nimbus Universal.
-
-Dokumentasi ini diharapkan dapat membantu proses pengembangan, pengujian, pemeliharaan, serta integrasi backend dengan modul lain dalam sistem ERP.
+- **`composer install` gagal karena versi PHP:** gunakan PHP 8.4 atau lebih baru.
+- **Halaman daftar klien tertulis "Gagal memuat data klien":** pastikan `http://127.0.0.1:8000/js/api.js` bisa dibuka dan server `php artisan serve` masih menyala.
+- **Tampilan polos tanpa gaya:** pastikan folder `public/css` ada.
+- **Data klien kosong:** jalankan `php artisan migrate:fresh --seed`.
 
 ---
 
-**Kelompok F-6**  
-Program Studi Teknik Informatika  
-Universitas Pasundan
+**Kelompok F-6**
+Program Studi Teknik Informatika, Universitas Pasundan
