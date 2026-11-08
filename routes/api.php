@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\InteractionController;
 use App\Http\Controllers\Api\DashboardController;
 
-// Tes API
+// Tes API (Bersifat publik untuk pemeriksaan awal)
 Route::get('/test', function () {
     return response()->json([
         'success' => true,
@@ -18,8 +18,9 @@ Route::get('/test', function () {
     ]);
 });
 
-// API CRM F-6
-Route::prefix('v1')->group(function () {
+// API CRM F-6 (Dilindungi oleh middleware verifikasi token F-1)
+// Catatan: Ganti 'auth:sanctum' dengan nama middleware kustom F-1 kelompokmu jika ada (misal: 'f1.auth')
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
