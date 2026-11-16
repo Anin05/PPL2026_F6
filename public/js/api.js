@@ -12,6 +12,14 @@ async function api(method, path, body) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw { status: res.status, error: data.error };
+  if (res.status === 401 && path !== '/session/login') {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('account');
+    location.href = '/login';
+  }
+  if (!res.ok) throw {
+    status: res.status,
+    error: data.error || (data.code ? { code: data.code, message: data.message } : undefined),
+  };
   return data;
 }

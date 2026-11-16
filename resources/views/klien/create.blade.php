@@ -194,7 +194,7 @@ document.getElementById('form-klien').addEventListener('submit', async (e) => {
   const f = Object.fromEntries(new FormData(e.target));
   try {
    await api('POST', '/clients', {
-  code: 'UJI-' + Date.now(),   // SEMENTARA, hapus setelah BE membuat kode otomatis
+  code: 'UJI-' + Date.now(),   
   name: f.nama, address: f.alamat, city: f.kota,
   phone: f.telp, mobile: f.hp, email: f.email,
 });

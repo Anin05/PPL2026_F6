@@ -5,53 +5,56 @@ use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\InteractionController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\SessionController;
+use App\Http\Middleware\VerifyF1Token;
 
-// Tes API
 Route::get('/test', function () {
     return response()->json([
         'success' => true,
         'message' => 'API Laravel F-6 berhasil!',
-        'data' => [
-            'project' => 'CRM Klien dan Kontak',
-            'status' => 'Berjalan',
-        ],
+        'data' => ['project' => 'CRM Klien dan Kontak', 'status' => 'Berjalan'],
     ]);
 });
 
-// API CRM F-6
 Route::prefix('v1')->group(function () {
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    // Publik: login (tanpa token)
+    Route::post('/session/login', [SessionController::class, 'login']);
 
-    // Klien
-    Route::get('/clients', [ClientController::class, 'index']);
-    Route::post('/clients', [ClientController::class, 'store']);
-    Route::get('/clients/{clientId}', [ClientController::class, 'show']);
-    Route::put('/clients/{clientId}', [ClientController::class, 'update']);
-    Route::patch('/clients/{clientId}/status', [ClientController::class, 'updateStatus']);
+    // Dilindungi token
+    Route::middleware(VerifyF1Token::class)->group(function () {
 
-    // Kontak Global
-    Route::get('/contacts', [ContactController::class, 'indexAll']);
-    Route::post('/contacts', [ContactController::class, 'storeGlobal']);
-    Route::get('/contacts/{contactId}', [ContactController::class, 'show']);
-    Route::put('/contacts/{contactId}', [ContactController::class, 'updateGlobal']);
-    Route::patch('/contacts/{contactId}/status', [ContactController::class, 'updateStatusGlobal']);
-    Route::delete('/contacts/{contactId}', [ContactController::class, 'destroyGlobal']);
+        Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // Kontak Scoped per Klien
-    Route::get('/clients/{clientId}/contacts', [ContactController::class, 'index']);
-    Route::post('/clients/{clientId}/contacts', [ContactController::class, 'store']);
-    Route::put('/clients/{clientId}/contacts/{contactId}', [ContactController::class, 'update']);
-    Route::patch('/clients/{clientId}/contacts/{contactId}/status', [ContactController::class, 'updateStatus']);
+        // Klien
+        Route::get('/clients', [ClientController::class, 'index']);
+        Route::post('/clients', [ClientController::class, 'store']);
+        Route::get('/clients/{clientId}', [ClientController::class, 'show']);
+        Route::put('/clients/{clientId}', [ClientController::class, 'update']);
+        Route::patch('/clients/{clientId}/status', [ClientController::class, 'updateStatus']);
 
-    // Riwayat Interaksi Global
-    Route::get('/interactions', [InteractionController::class, 'indexAll']);
-    Route::post('/interactions', [InteractionController::class, 'storeGlobal']);
-    Route::get('/interactions/{id}', [InteractionController::class, 'show']);
-    Route::delete('/interactions/{id}', [InteractionController::class, 'destroyGlobal']);
+        // Kontak global
+        Route::get('/contacts', [ContactController::class, 'indexAll']);
+        Route::post('/contacts', [ContactController::class, 'storeGlobal']);
+        Route::get('/contacts/{contactId}', [ContactController::class, 'show']);
+        Route::put('/contacts/{contactId}', [ContactController::class, 'updateGlobal']);
+        Route::patch('/contacts/{contactId}/status', [ContactController::class, 'updateStatusGlobal']);
+        Route::delete('/contacts/{contactId}', [ContactController::class, 'destroyGlobal']);
 
-    // Riwayat interaksi Scoped per Klien
-    Route::get('/clients/{clientId}/interactions', [InteractionController::class, 'index']);
-    Route::post('/clients/{clientId}/interactions', [InteractionController::class, 'store']);
+        // Kontak per klien
+        Route::get('/clients/{clientId}/contacts', [ContactController::class, 'index']);
+        Route::post('/clients/{clientId}/contacts', [ContactController::class, 'store']);
+        Route::put('/clients/{clientId}/contacts/{contactId}', [ContactController::class, 'update']);
+        Route::patch('/clients/{clientId}/contacts/{contactId}/status', [ContactController::class, 'updateStatus']);
+
+        // Riwayat interaksi global
+        Route::get('/interactions', [InteractionController::class, 'indexAll']);
+        Route::post('/interactions', [InteractionController::class, 'storeGlobal']);
+        Route::get('/interactions/{id}', [InteractionController::class, 'show']);
+        Route::delete('/interactions/{id}', [InteractionController::class, 'destroyGlobal']);
+
+        // Riwayat interaksi per klien
+        Route::get('/clients/{clientId}/interactions', [InteractionController::class, 'index']);
+        Route::post('/clients/{clientId}/interactions', [InteractionController::class, 'store']);
+    });
 });
