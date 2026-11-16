@@ -15,6 +15,7 @@ class DashboardAndContactTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\VerifyF1Token::class);
 
         $client = Client::create([
             'code' => 'CLI-TEST',

@@ -18,6 +18,7 @@ class SessionController extends Controller
 
         try {
             $res = Http::acceptJson()
+                ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
                 ->timeout(90)
                 ->post(rtrim(config('services.f1.url'), '/') . '/auth/login', $data);
         } catch (ConnectionException $e) {

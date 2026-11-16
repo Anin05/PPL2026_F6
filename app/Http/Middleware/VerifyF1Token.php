@@ -24,7 +24,7 @@ class VerifyF1Token
         $payload = count($parts) === 3
             ? json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true)
             : null;
-        $accountId = $payload['accountId'] ?? null;
+        $accountId = $payload['accountId'] ?? $payload['sub'] ?? $payload['id'] ?? null;
         if (!$accountId) {
             return $this->fail(401, 'INVALID_TOKEN', 'Token tidak valid.');
         }
@@ -34,7 +34,10 @@ class VerifyF1Token
 
         if (!$role) {
             try {
-                $res = Http::acceptJson()->withToken($token)->timeout(30)
+                $res = Http::acceptJson()
+                    ->withHeaders(['ngrok-skip-browser-warning' => 'true'])
+                    ->withToken($token)
+                    ->timeout(30)
                     ->get(rtrim(config('services.f1.url'), '/') . "/accounts/{$accountId}/role");
             } catch (ConnectionException $e) {
                 return $this->fail(503, 'F1_UNAVAILABLE', 'Server F-1 tidak bisa dihubungi.');

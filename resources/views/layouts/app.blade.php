@@ -90,10 +90,18 @@
                         <i class="dot"></i>
                     </button>
                     <span class="top-sep"></span>
-                    <button class="user" id="userBtn" type="button">
-                        <span class="user-av">AC</span>
-                        <span class="user-t"><b>Admin CRM</b><small>Administrator</small></span>
-                    </button>
+                    <div class="rel" style="display:inline-block;">
+                        <button class="user" id="userBtn" type="button" data-dropdown-trigger>
+                            <span class="user-av" id="userInitial">AC</span>
+                            <span class="user-t"><b id="userNameDisplay">Admin CRM</b><small id="userRoleDisplay">Administrator</small></span>
+                        </button>
+                        <div class="dropdown-menu" style="right:0; margin-top:8px;">
+                            <button type="button" class="dropdown-item danger" onclick="logoutUser()">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                Keluar (Logout)
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -145,6 +153,30 @@
     </script>
     <script src="{{ asset('js/api.js') }}"></script>
     <script>
+        // Ambil info nama & role yang login dari sessionStorage
+        (function () {
+            try {
+                const acc = JSON.parse(sessionStorage.getItem('account') || '{}');
+                if (acc.username || acc.name) {
+                    const name = acc.name || acc.username;
+                    const role = acc.roleCode || acc.role || 'Staff CRM';
+                    const elName = document.getElementById('userNameDisplay');
+                    const elRole = document.getElementById('userRoleDisplay');
+                    const elInit = document.getElementById('userInitial');
+                    if (elName) elName.textContent = name;
+                    if (elRole) elRole.textContent = role;
+                    if (elInit) elInit.textContent = name.substring(0, 2).toUpperCase();
+                }
+            } catch (e) {}
+        })();
+
+        function logoutUser() {
+            if (confirm('Yakin ingin keluar (logout) dari akun ini?')) {
+                sessionStorage.clear();
+                window.location.href = '/login';
+            }
+        }
+
         // tampilkan pesan sukses yang disimpan sebelum pindah halaman
         (function () {
             const msg = sessionStorage.getItem('flash');
