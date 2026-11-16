@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\SessionController;
 use App\Http\Middleware\VerifyF1Token;
 
+// Tes API (Bersifat publik untuk pemeriksaan awal)
 Route::get('/test', function () {
     return response()->json([
         'success' => true,
@@ -21,7 +22,7 @@ Route::prefix('v1')->group(function () {
     // Publik: login (tanpa token)
     Route::post('/session/login', [SessionController::class, 'login']);
 
-    // Dilindungi token
+    // Dilindungi token F-1
     Route::middleware(VerifyF1Token::class)->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
