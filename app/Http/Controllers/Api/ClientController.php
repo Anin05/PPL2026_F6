@@ -159,6 +159,7 @@ class ClientController extends Controller
             'phone' => ['sometimes', 'nullable', 'string', 'max:30'],
             'mobile' => ['sometimes', 'nullable', 'string', 'max:30'], // <-- Ditambahkan
             'email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'status' => ['sometimes', 'nullable', 'string', 'in:active,archived'],
         ]);
 
         if ($validator->fails()) {
